@@ -73,6 +73,11 @@ func (c *Crawler) SetReporter(r Reporter) {
 	c.reporter = r
 }
 
+// SetFetcher sets a custom fetcher for testing purposes
+func (c *Crawler) SetFetcher(f Fetcher) {
+	c.fetcher = f
+}
+
 // Crawl the URL
 func (c *Crawler) Crawl() error {
 	ctx, cancel := context.WithCancel(context.Background())

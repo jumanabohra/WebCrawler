@@ -17,10 +17,8 @@ test-integration:
 # Test coverage
 test-coverage:
 	go test ./... -coverprofile=coverage.out -coverpkg=./internal/...,./cmd/...
-	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
 	@go tool cover -func=coverage.out | tail -1
-
 
 # Performance profiling with pprof
 build-pprof: build
@@ -59,4 +57,4 @@ pprof-mem:
 
 clean:
 	rm -f crawler
-	rm -f *.prof coverage.out coverage.html
+	rm -f *.prof 
