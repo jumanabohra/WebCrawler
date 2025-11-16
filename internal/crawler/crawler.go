@@ -23,7 +23,7 @@ type (
 	}
 
 	UrlManager interface {
-		ShouldVisit(url string) (bool, string, error)
+		ShouldVisit(url string, baseURL string) (bool, string, error)
 		MarkAsVisited(url string) error
 	}
 
@@ -149,8 +149,8 @@ func (c *Crawler) worker(ctx context.Context) {
 // ProcessURL processes a single URL
 func (c *Crawler) processURL(url string) {
 
-	// Check if the URL should be visited
-	shouldVisit, normalizedUrl, err := c.urlmanager.ShouldVisit(url)
+	// Check if the URL should be visited (no base URL needed for initial URL)
+	shouldVisit, normalizedUrl, err := c.urlmanager.ShouldVisit(url, "")
 	if err != nil {
 		log.Fatalf("Failed to check if URL should be visited: %v", err)
 		return
@@ -181,9 +181,12 @@ func (c *Crawler) processURL(url string) {
 	}
 
 	// Queue the new URLs directly to urlQueue (buffered, so won't block)
+	// Pass the current page URL (normalizedUrl) as base URL for resolving relative links
 	for _, link := range links {
-		atomic.AddInt64(&c.activeWork, 1) // Increment counter for each new URL
-		c.urlQueue <- link
+		if shouldVisit, normalizedLink, _ := c.urlmanager.ShouldVisit(link, normalizedUrl); shouldVisit {
+			atomic.AddInt64(&c.activeWork, 1) // Increment counter for each new URL
+			c.urlQueue <- normalizedLink
+		}
 	}
 
 	// Send the result to the result queue

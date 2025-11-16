@@ -11,7 +11,7 @@ func TestUrlManager_ShouldVisit(t *testing.T) {
 		t.Fatalf("Failed to create UrlManager: %v", err)
 	}
 
-	shouldVisit, normalizedUrl, err := urlManager.ShouldVisit("https://crawlme.monzo.com/about")
+	shouldVisit, normalizedUrl, err := urlManager.ShouldVisit("https://crawlme.monzo.com/about", "")
 	if err != nil {
 		t.Fatalf("Failed to check if URL should be visited: %v", err)
 	}
@@ -32,7 +32,7 @@ func TestUrlManager_MarkAsVisited(t *testing.T) {
 	url := "https://crawlme.monzo.com/about"
 
 	// Before marking: should be visitable
-	shouldVisit, _, err := urlManager.ShouldVisit(url)
+	shouldVisit, _, err := urlManager.ShouldVisit(url, "")
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -47,7 +47,7 @@ func TestUrlManager_MarkAsVisited(t *testing.T) {
 	}
 
 	// After marking: should NOT be visitable
-	shouldVisit, _, err = urlManager.ShouldVisit(url)
+	shouldVisit, _, err = urlManager.ShouldVisit(url, "")
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}

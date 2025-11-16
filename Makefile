@@ -16,7 +16,7 @@ test-integration:
 
 # Test coverage
 test-coverage:
-	go test ./... -coverprofile=coverage.out
+	go test ./... -coverprofile=coverage.out -coverpkg=./internal/...,./cmd/...
 	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
 	@go tool cover -func=coverage.out | tail -1

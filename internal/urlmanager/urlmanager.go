@@ -57,14 +57,25 @@ func (u *UrlManager) isWithinBaseDomain(urlStr string) bool {
 }
 
 // Normalize the url - parse, remove fragment, and normalize path
-func (u *UrlManager) normalizeUrl(urlStr string) (string, error) {
+// baseURLStr is the URL of the page where this link was found (for resolving relative URLs)
+func (u *UrlManager) normalizeUrl(urlStr string, baseURLStr string) (string, error) {
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
 		return "", err
 	}
 
 	if parsedURL.Scheme == "" {
-		parsedURL = u.baseURL.ResolveReference(parsedURL)
+		// Use the base URL of the current page if provided, otherwise use the initial base URL
+		var baseURL *url.URL
+		if baseURLStr != "" {
+			baseURL, err = url.Parse(baseURLStr)
+			if err != nil {
+				return "", err
+			}
+		} else {
+			baseURL = u.baseURL
+		}
+		parsedURL = baseURL.ResolveReference(parsedURL)
 	}
 
 	parsedURL.Fragment = ""
@@ -73,8 +84,9 @@ func (u *UrlManager) normalizeUrl(urlStr string) (string, error) {
 }
 
 // ShouldVisit checks if a URL should be visited (not already visited and within base domain)
-func (u *UrlManager) ShouldVisit(urlStr string) (bool, string, error) {
-	normalizedUrl, err := u.normalizeUrl(urlStr)
+// baseURLStr is the URL of the page where this link was found (for resolving relative URLs)
+func (u *UrlManager) ShouldVisit(urlStr string, baseURLStr string) (bool, string, error) {
+	normalizedUrl, err := u.normalizeUrl(urlStr, baseURLStr)
 	if err != nil {
 		return false, "", err
 	}
@@ -92,7 +104,8 @@ func (u *UrlManager) ShouldVisit(urlStr string) (bool, string, error) {
 }
 
 func (u *UrlManager) MarkAsVisited(urlStr string) error {
-	normalizedUrl, err := u.normalizeUrl(urlStr)
+	// When marking as visited, we already have the normalized URL, so no need for base URL
+	normalizedUrl, err := u.normalizeUrl(urlStr, "")
 	if err != nil {
 		return err
 	}
