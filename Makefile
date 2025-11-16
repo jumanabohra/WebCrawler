@@ -4,6 +4,17 @@ build:
 run:
 	./crawler -url https://crawlme.monzo.com/ -workers 10 -timeout 30
 
+# Code quality checks
+vet:
+	go vet ./...
+
+lint:
+	@if command -v golangci-lint > /dev/null; then \
+		golangci-lint run; \
+	else \
+		echo "golangci-lint not installed. Install with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"; \
+	fi
+
 # Test commands
 test:
 	go test ./... -v
@@ -57,4 +68,4 @@ pprof-mem:
 
 clean:
 	rm -f crawler
-	rm -f *.prof 
+	rm -f *.prof coverage.out

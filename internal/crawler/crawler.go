@@ -88,7 +88,7 @@ func (c *Crawler) Crawl() error {
 	go c.detectCompletion(ctx)
 
 	// Start worker goroutines
-	for i := 0; i < c.config.Workers; i++ {
+	for range c.config.Workers {
 		c.wg.Add(1)
 		go c.worker(ctx)
 	}

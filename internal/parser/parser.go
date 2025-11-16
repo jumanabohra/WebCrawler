@@ -10,14 +10,13 @@ import (
 type Parser struct {
 }
 
-// New creates a new Parser
 func New() *Parser {
 	return &Parser{}
 }
 
 // Parse the body and return list of links found in the body
 func (p *Parser) Parse(body []byte) ([]string, error) {
-	// Implementation will go here
+
 	links := []string{}
 	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
 	if err != nil {
