@@ -45,7 +45,7 @@ func TestCrawler_Crawl(t *testing.T) {
 
 	// Create crawler
 	c, err := crawler.New(crawler.Config{
-		URL:     "https://www.crawlme.monzo.com/",
+		URL:     "https://crawlme.monzo.com/",
 		Workers: 2, // Use fewer workers for testing
 		Timeout: 10 * time.Second,
 	})
@@ -53,25 +53,33 @@ func TestCrawler_Crawl(t *testing.T) {
 		t.Fatalf("Failed to create crawler: %v", err)
 	}
 
-	// TODO: To use mockReporter, Crawler.New() would need to accept
-	// an optional Reporter parameter, or add a SetReporter() method.
-	// For now, this test verifies the crawler runs successfully.
-	//
-	// Example of how it would work with dependency injection:
-	// c, err := crawler.NewWithReporter(config, mockReporter)
-	// Then after Crawl():
-	// mockReporter.Wait()
-	// results := mockReporter.GetResults()
-	// if len(results) == 0 {
-	//     t.Error("Expected at least one result")
-	// }
+	// Inject mock reporter for testing
+	c.SetReporter(mockReporter)
 
+	// Run the crawler
 	err = c.Crawl()
 	if err != nil {
 		t.Fatalf("Failed to crawl: %v", err)
 	}
 
-	// Integration test verifies the crawler runs to completion
-	// The mockReporter is ready to use once dependency injection is added
-	_ = mockReporter // Suppress unused variable warning
+	// Wait for reporter to finish processing all results
+	mockReporter.Wait()
+
+	// Verify that results were collected
+	results := mockReporter.GetResults()
+	if len(results) == 0 {
+		t.Error("Expected at least one result from crawling")
+	}
+
+	// Verify that the initial URL was crawled
+	foundInitialURL := false
+	for _, result := range results {
+		if result.URL == "https://crawlme.monzo.com" {
+			foundInitialURL = true
+			break
+		}
+	}
+	if !foundInitialURL {
+		t.Error("Expected to find the initial URL in results")
+	}
 }
