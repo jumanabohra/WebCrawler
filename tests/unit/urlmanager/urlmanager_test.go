@@ -18,7 +18,7 @@ func TestUrlManager_ShouldVisit(t *testing.T) {
 	if !shouldVisit {
 		t.Fatalf("URL should be visited")
 	}
-	if normalizedUrl != "https://crawlme.monzo.com/about.html" {
+	if normalizedUrl != "https://crawlme.monzo.com/about" {
 		t.Fatalf("Normalized URL is incorrect")
 	}
 }
